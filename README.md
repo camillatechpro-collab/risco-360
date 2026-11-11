@@ -11,7 +11,7 @@ SaaS de gestão de SST: cadastro de empresas, GHE e inventário de riscos, com g
 ## Rodar localmente
 
 1. Copie `.env.example` para `.env.local` e preencha a chave pública do Supabase.
-2. Aplique as migrações no Supabase (SQL Editor ou `supabase db push`).
+2. As migrações de `supabase/migrations/` são aplicadas automaticamente pela integração GitHub do Supabase a cada envio para o branch `main`. Nunca edite uma migração já aplicada: crie um arquivo novo.
 3. `npm install` e `npm run dev`, depois abra http://localhost:3000
 
 ## Fases
