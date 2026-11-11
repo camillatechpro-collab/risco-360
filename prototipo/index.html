@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risco360 — PGR, PCMSO e LTCAT</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1d2b36;background:#f2f5f7;font-size:14px}
+#app{display:flex;min-height:100vh}
+#side{width:260px;flex-shrink:0;background:#0f3d3e;color:#e6f2f1;display:flex;flex-direction:column;padding:16px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:23px;padding:4px 8px 16px;font-weight:300}.brand b{color:#5fd3b3;font-weight:700}.brand small{display:block;font-size:11px;opacity:.7;letter-spacing:.6px;margin-top:2px}
+.side-btn{display:block;width:100%;text-align:left;background:transparent;border:none;color:#e6f2f1;padding:8px 10px;border-radius:7px;margin-bottom:2px}
+.side-btn:hover{background:#ffffff14}.side-btn.act{background:#127369}
+.side-h{display:flex;justify-content:space-between;align-items:center;font-size:11px;text-transform:uppercase;letter-spacing:.6px;opacity:.8;margin:18px 8px 8px}
+.side-h .mini{background:#5fd3b3;color:#0f3d3e;border:none;padding:3px 9px;font-weight:700;font-size:11px}
+.side-search{background:#ffffff12;border:1px solid #ffffff22;color:#fff;margin-bottom:8px}
+.side-search::placeholder{color:#ffffff88}
+.side-emp small{display:block;font-size:11px;opacity:.65}
+.side-foot{margin-top:auto;display:flex;gap:6px;padding-top:12px;flex-wrap:wrap}
+.side-foot button,.side-foot label{flex:1;background:#ffffff12;color:#e6f2f1;border:1px solid #ffffff22;font-size:12px;padding:6px;border-radius:7px;text-align:center;cursor:pointer;flex-direction:row;justify-content:center;font-weight:400}
+main{flex:1;padding:24px 32px;min-width:0}
+h1.pg{margin:0 0 4px;font-size:22px}.sub{color:#607d8b;margin:0 0 18px}
+.card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px;overflow-x:auto}
+.card h3{margin:0 0 12px;font-size:15px}
+button{font:inherit;cursor:pointer;border:1px solid #cfd8dc;background:#fff;border-radius:7px;padding:7px 12px;color:#1d2b36}
+button:hover{border-color:#90a4ae}
+button.pri{background:#127369;color:#fff;border-color:#127369}button.pri:hover{background:#0e5f57}
+button.del{border:none;background:transparent;color:#b0bec5;padding:4px 8px}button.del:hover{color:#c62828}
+button.link{border:none;background:none;color:#127369;padding:2px 4px;text-decoration:underline}
+input,select,textarea{font:inherit;padding:7px 9px;border:1px solid #cfd8dc;border-radius:6px;width:100%;background:#fff;color:#1d2b36}
+textarea{min-height:60px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid #5fd3b3;border-color:#5fd3b3}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#546e7a;font-weight:600}
+.fg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.span2{grid-column:span 2}.span3{grid-column:span 3}.span4{grid-column:1/-1}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}.grow{flex:1;min-width:0}
+.muted{color:#78909c}
+.tabs{display:flex;gap:4px;border-bottom:2px solid #dfe5e8;margin-bottom:18px;flex-wrap:wrap}
+.tabs button{border:none;background:none;border-radius:7px 7px 0 0;padding:10px 16px;color:#546e7a;font-weight:600;margin-bottom:-2px;border-bottom:2px solid transparent}
+.tabs button.act{color:#127369;border-bottom-color:#127369}
+table.t{width:100%;border-collapse:collapse}
+.t th{font-size:11px;text-transform:uppercase;color:#78909c;letter-spacing:.4px;font-weight:600}
+.t th,.t td{padding:8px;border-bottom:1px solid #eceff1;text-align:left;vertical-align:top}
+.t tr:hover td{background:#fafcfc}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.nv-baixo{background:#43a047}.nv-moderado{background:#f9a825}.nv-alto{background:#ef6c00}.nv-critico{background:#c62828}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}.stat b{display:block;font-size:26px;color:#127369}.stat span{color:#78909c;font-size:12px}
+.ghe-wrap{display:flex;gap:16px;align-items:flex-start}
+.ghe-list{width:240px;flex-shrink:0;padding:10px}
+.ghe-item{display:block;width:100%;text-align:left;border:none;padding:9px 10px;margin-bottom:4px;border-radius:7px}
+.ghe-item small{display:block;color:#78909c;font-size:11px}.ghe-item.act{background:#e0f2ef}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:flex;flex-direction:row;align-items:center;gap:6px;border:1px solid #cfd8dc;border-radius:16px;padding:4px 10px;font-weight:500;color:#37474f;cursor:pointer}
+.chip input{width:auto;margin:0}.chip.on{background:#e0f2ef;border-color:#5fd3b3}
+.matriz{display:inline-grid;grid-template-columns:70px repeat(5,38px);gap:2px;font-size:10px;text-align:center}
+.matriz div{padding:6px 0;border-radius:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.matriz .c{color:#fff;font-weight:700;font-size:12px}
+.matriz .lbl{color:#607d8b;text-align:right;padding-right:6px}
+.alerta{background:#fff8e1;border-left:4px solid #f9a825;padding:8px 12px;border-radius:4px;margin:6px 0;font-size:13px}
+.ok{background:#e8f5e9;border-left:4px solid #43a047;padding:8px 12px;border-radius:4px;margin:6px 0;font-size:13px}
+.docs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.doccard h3{font-size:18px;margin-bottom:4px}.doccard p{color:#607d8b;margin:0 0 12px;font-size:13px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;padding:8px 0 8px 38px;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:0;top:6px;width:26px;height:26px;border-radius:50%;background:#e0f2ef;color:#127369;font-weight:700;display:flex;align-items:center;justify-content:center}
+dialog{border:none;border-radius:12px;padding:0;width:min(920px,95vw);box-shadow:0 10px 40px rgba(0,0,0,.3);max-height:92vh}
+dialog::backdrop{background:#0f3d3e88}
+.dlg-h{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #eceff1;font-weight:700;font-size:16px}
+.dlg-h button{border:none}
+.dlg-b{padding:18px 20px;overflow:auto;max-height:calc(92vh - 130px)}
+.dlg-f{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #eceff1}
+.sep{grid-column:1/-1;font-size:12px;font-weight:700;color:#127369;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e0f2ef;padding-bottom:4px;margin-top:6px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#263238;color:#fff;padding:10px 18px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+#toast.show{opacity:1}
+/* Documento */
+#doc{display:none;position:fixed;inset:0;background:#525659;overflow:auto;z-index:50}
+#doc.show{display:block}
+.doc-bar{position:sticky;top:0;background:#263238;color:#fff;padding:10px 20px;display:flex;gap:10px;align-items:center;z-index:2}
+.doc-bar .grow{font-weight:600}
+.paper{background:#fff;width:210mm;margin:20px auto;padding:20mm 18mm;font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;line-height:1.45;color:#000}
+.paper h1{font-size:20pt}.paper h2.sec{font-size:13pt;background:#0f3d3e;color:#fff;padding:5px 10px;margin:22px 0 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.paper h3{font-size:11pt;margin:16px 0 6px;border-bottom:1px solid #999;padding-bottom:2px}
+.paper table{width:100%;border-collapse:collapse;margin:6px 0 12px;font-size:9pt}
+.paper th,.paper td{border:1px solid #888;padding:4px 6px;text-align:left;vertical-align:top}
+.paper th{background:#e0ece9;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.paper .kv th{width:32%}
+.capa{height:250mm;display:flex;flex-direction:column;justify-content:center;text-align:center;border:3px double #0f3d3e;padding:20mm}
+.capa .top{font-size:12pt;letter-spacing:1px;color:#127369;font-weight:700;margin-bottom:40mm}
+.capa h1{margin:0;color:#0f3d3e;font-size:30pt}.capa h2{font-weight:400;margin:6px 0 40mm;font-size:13pt}
+.capa .emp{font-size:13pt}.capa .dt{margin-top:30mm;color:#444}
+.assin{margin:40px auto 0;width:60%;text-align:center;border-top:1px solid #000;padding-top:6px}
+.nota{font-size:8.5pt;color:#555;font-style:italic}
+@media print{
+  body{background:#fff}
+  #app,.doc-bar,dialog,#toast{display:none!important}
+  #doc{position:static;display:block!important;background:#fff;overflow:visible}
+  .paper{margin:0;padding:0;width:auto;box-shadow:none}
+  .capa{page-break-after:always;height:255mm}
+  h2.sec,h3{page-break-after:avoid}tr{page-break-inside:avoid}
+  @page{size:A4;margin:16mm 14mm}
+}
+@media (max-width:900px){#side{width:200px}.fg,.docs,.stats{grid-template-columns:1fr 1fr}.ghe-wrap{flex-direction:column}.ghe-list{width:100%}main{padding:16px}}
+</style>
+</head>
+<body>
+<div id="app"><aside id="side"></aside><main id="main"></main></div>
+<div id="doc"></div>
+<dialog id="dlg"></dialog>
+<div id="toast"></div>
+<script>
+/* ================== BIBLIOTECA TÉCNICA ================== */
+const TIPOS={
+  fisico:{n:'Físico',c:'#2e9d4f'}, quimico:{n:'Químico',c:'#d63b3b'}, biologico:{n:'Biológico',c:'#8a5a2b'},
+  ergonomico:{n:'Ergonômico',c:'#d39e00'}, acidente:{n:'Acidente / Mecânico',c:'#2f6fd6'}, psicossocial:{n:'Psicossocial',c:'#8a4fd6'}
+};
+// exames: [nome, periodicidade sugerida]  — SUGESTÕES, sempre validar com o médico responsável
+const AGENTES=[
+ {id:'ruido',tipo:'fisico',nome:'Ruído contínuo ou intermitente',unid:'dB(A)',lt:85,anexoIV:'2.0.1',esocial:'02.01.001',tecnica:'Dosimetria – NHO-01 (Fundacentro)',danos:'Perda auditiva induzida por ruído (PAIR), zumbido, irritabilidade, estresse',exames:[['Audiometria tonal (via aérea e óssea)','Admissional, 6 meses após, depois anual']]},
+ {id:'calor',tipo:'fisico',nome:'Calor',unid:'IBUTG (°C)',lt:'',anexoIV:'2.0.4',tecnica:'NHO-06 (Fundacentro) – IBUTG × taxa metabólica',danos:'Desidratação, cãibras, exaustão e intermação',exames:[]},
+ {id:'vib_mb',tipo:'fisico',nome:'Vibração de mãos e braços (VMB)',unid:'aren (m/s²)',lt:5,anexoIV:'2.0.2',tecnica:'NHO-10 (Fundacentro)',danos:'Distúrbios vasculares (dedo branco), neurológicos e osteoarticulares',exames:[]},
+ {id:'vib_ci',tipo:'fisico',nome:'Vibração de corpo inteiro (VCI)',unid:'aren (m/s²)',lt:1.1,anexoIV:'2.0.2',tecnica:'NHO-09 (Fundacentro)',danos:'Lombalgias e lesões na coluna vertebral',exames:[]},
+ {id:'frio',tipo:'fisico',nome:'Frio (câmaras frias)',unid:'°C',lt:'',anexoIV:'',tecnica:'Avaliação qualitativa – NR-15 Anexo 9',danos:'Hipotermia, ulcerações, doenças respiratórias',exames:[]},
+ {id:'rad_ion',tipo:'fisico',nome:'Radiações ionizantes',unid:'mSv/ano',lt:20,anexoIV:'2.0.3',tecnica:'Dosimetria individual (normas CNEN)',danos:'Câncer, alterações hematológicas, catarata',exames:[['Hemograma completo com plaquetas','Semestral']]},
+ {id:'rad_nion',tipo:'fisico',nome:'Radiações não ionizantes (solda, UV solar)',unid:'',lt:'',anexoIV:'',tecnica:'Avaliação qualitativa',danos:'Queimaduras, lesões oculares, câncer de pele',exames:[['Acuidade visual','Anual']]},
+ {id:'umidade',tipo:'fisico',nome:'Umidade excessiva',unid:'',lt:'',anexoIV:'',tecnica:'Avaliação qualitativa – NR-15 Anexo 10',danos:'Dermatoses, doenças respiratórias',exames:[]},
+ {id:'silica',tipo:'quimico',nome:'Poeira contendo sílica livre cristalizada',unid:'mg/m³',lt:'',anexoIV:'1.0.18',qualitativo:true,tecnica:'NHO-08 (Fundacentro) – poeira respirável',danos:'Silicose, câncer de pulmão, DPOC',exames:[['Radiografia de tórax (padrão OIT)','Admissional e periódica a critério médico'],['Espirometria','Admissional e bienal']]},
+ {id:'poeira',tipo:'quimico',nome:'Poeiras minerais ou vegetais (respirável/total)',unid:'mg/m³',lt:'',anexoIV:'',tecnica:'NHO-08 (Fundacentro)',danos:'Irritação respiratória, pneumoconioses, asma ocupacional',exames:[['Espirometria','Admissional e bienal']]},
+ {id:'benzeno',tipo:'quimico',nome:'Benzeno e produtos que o contenham',unid:'ppm',lt:'',anexoIV:'1.0.3',qualitativo:true,tecnica:'Avaliação qualitativa (cancerígeno – LINACH grupo 1)',danos:'Leucemia, aplasia de medula, alterações hematológicas',exames:[['Hemograma completo com plaquetas','Semestral']]},
+ {id:'solventes',tipo:'quimico',nome:'Solventes orgânicos (tolueno, xileno, thinner)',unid:'ppm',lt:'',anexoIV:'',tecnica:'NR-15 Anexo 11 / ACGIH',danos:'Dermatites, efeitos neurológicos, hepatotoxicidade',exames:[['Hemograma completo','Anual'],['Função hepática (TGO, TGP, GGT)','Anual']]},
+ {id:'fumos',tipo:'quimico',nome:'Fumos metálicos (soldagem)',unid:'mg/m³',lt:'',anexoIV:'',tecnica:'NHO-08 / NR-15 Anexo 11',danos:'Febre dos fumos metálicos, doenças pulmonares',exames:[['Espirometria','Bienal'],['Radiografia de tórax (padrão OIT)','A critério médico']]},
+ {id:'oleos',tipo:'quimico',nome:'Óleos minerais, graxas e lubrificantes',unid:'',lt:'',anexoIV:'',tecnica:'Avaliação qualitativa – NR-15 Anexo 13',danos:'Dermatoses ocupacionais, foliculite',exames:[]},
+ {id:'saneantes',tipo:'quimico',nome:'Produtos de limpeza (saneantes)',unid:'',lt:'',anexoIV:'',tecnica:'Avaliação qualitativa',danos:'Dermatites de contato, irritação ocular e respiratória',exames:[]},
+ {id:'bio_saude',tipo:'biologico',nome:'Microrganismos – contato com pacientes ou material infectocontagiante',unid:'',lt:'',anexoIV:'3.0.1',qualitativo:true,tecnica:'Avaliação qualitativa',danos:'Hepatites B e C, HIV, tuberculose e outras infecções',exames:[['Hemograma completo','Anual'],['Anti-HBs (pós-vacinal)','Admissional'],['Verificação vacinal (hepatite B, tétano, influenza)','Anual']]},
+ {id:'bio_esgoto',tipo:'biologico',nome:'Esgoto, lixo urbano e resíduos',unid:'',lt:'',anexoIV:'3.0.1',qualitativo:true,tecnica:'Avaliação qualitativa – NR-15 Anexo 14',danos:'Leptospirose, hepatite A, parasitoses, tétano',exames:[['Hemograma completo','Anual'],['Parasitológico de fezes','Anual'],['Verificação vacinal (tétano, hepatite A)','Anual']]},
+ {id:'bio_animais',tipo:'biologico',nome:'Contato com animais e seus resíduos',unid:'',lt:'',anexoIV:'',tecnica:'Avaliação qualitativa',danos:'Zoonoses (brucelose, raiva, leptospirose)',exames:[['Hemograma completo','Anual']]},
+ {id:'postura',tipo:'ergonomico',nome:'Postura inadequada / em pé prolongada',danos:'Dores musculoesqueléticas, varizes, lombalgia',exames:[]},
+ {id:'repetitivo',tipo:'ergonomico',nome:'Movimentos repetitivos de membros superiores',danos:'LER/DORT, tendinites, síndrome do túnel do carpo',exames:[]},
+ {id:'cargas',tipo:'ergonomico',nome:'Levantamento e transporte manual de cargas',danos:'Lombalgias, hérnia de disco, distensões',exames:[]},
+ {id:'monitor',tipo:'ergonomico',nome:'Trabalho com computador / mobiliário inadequado',danos:'Dores cervicais e lombares, fadiga visual, LER/DORT',exames:[['Acuidade visual','A critério médico']]},
+ {id:'turnos',tipo:'ergonomico',nome:'Trabalho noturno ou em turnos',danos:'Distúrbios do sono, fadiga, alterações metabólicas',exames:[['Glicemia de jejum','Anual']]},
+ {id:'altura',tipo:'acidente',nome:'Trabalho em altura (NR-35)',danos:'Quedas com lesões graves ou fatais',exames:[['Eletrocardiograma','Anual'],['Glicemia de jejum','Anual'],['Acuidade visual','Anual'],['Avaliação psicossocial (aptidão NR-35)','Anual']]},
+ {id:'eletricidade',tipo:'acidente',nome:'Eletricidade (NR-10)',danos:'Choque elétrico, queimaduras, morte',exames:[['Eletrocardiograma','Anual'],['Avaliação psicossocial','Anual']]},
+ {id:'maquinas',tipo:'acidente',nome:'Máquinas e equipamentos com partes móveis (NR-12)',danos:'Esmagamentos, amputações, cortes',exames:[]},
+ {id:'confinado',tipo:'acidente',nome:'Espaço confinado (NR-33)',danos:'Asfixia, intoxicação, explosão',exames:[['Eletrocardiograma','Anual'],['Espirometria','Anual'],['Avaliação psicossocial','Anual']]},
+ {id:'queda_nivel',tipo:'acidente',nome:'Queda de mesmo nível (piso escorregadio/irregular)',danos:'Contusões, entorses, fraturas',exames:[]},
+ {id:'cortes',tipo:'acidente',nome:'Ferramentas manuais / materiais perfurocortantes',danos:'Cortes, perfurações, lacerações',exames:[]},
+ {id:'incendio',tipo:'acidente',nome:'Incêndio ou explosão (inflamáveis – NR-20)',danos:'Queimaduras, intoxicação por fumaça, morte',exames:[]},
+ {id:'veiculos',tipo:'acidente',nome:'Condução de veículos / empilhadeiras (NR-11)',danos:'Colisões, atropelamentos, tombamentos',exames:[['Acuidade visual','Anual'],['Eletrocardiograma','Anual'],['Glicemia de jejum','Anual']]},
+ {id:'animais_peconhentos',tipo:'acidente',nome:'Animais peçonhentos',danos:'Envenenamento, reações alérgicas',exames:[]},
+ {id:'sobrecarga',tipo:'psicossocial',nome:'Sobrecarga de trabalho / metas excessivas',danos:'Estresse, ansiedade, burnout',exames:[]},
+ {id:'assedio',tipo:'psicossocial',nome:'Assédio moral ou sexual',danos:'Ansiedade, depressão, transtornos mentais',exames:[]},
+ {id:'violencia',tipo:'psicossocial',nome:'Atendimento ao público / exposição a violência',danos:'Estresse pós-traumático, ansiedade',exames:[]},
+ {id:'isolado',tipo:'psicossocial',nome:'Trabalho isolado / baixo apoio social',danos:'Estresse, sofrimento psíquico',exames:[]},
+ {id:'autonomia',tipo:'psicossocial',nome:'Baixa autonomia / falta de clareza de papéis',danos:'Desmotivação, estresse, conflitos',exames:[]},
+];
+const AG=Object.fromEntries(AGENTES.map(a=>[a.id,a]));
+const PROB=['','1 – Rara','2 – Improvável','3 – Possível','4 – Provável','5 – Quase certa'];
+const SEV=['','1 – Insignificante','2 – Leve','3 – Moderada','4 – Grave','5 – Catastrófica'];
+const EXPO=['Habitual e permanente','Habitual e intermitente','Eventual / ocasional'];
+
+const MODELOS={
+ escritorio:{nome:'Escritório administrativo',grau:'1',atividade:'Atividades administrativas e de escritório.',
+  setores:[['Administrativo','Sala climatizada, piso cerâmico, iluminação natural e artificial, mobiliário de escritório.']],
+  cargos:[['Assistente administrativo','4110-10','Administrativo',3,'Executa rotinas administrativas, digitação, atendimento telefônico e arquivo de documentos.'],['Recepcionista','4221-05','Administrativo',1,'Recepciona visitantes, atende telefone, agenda compromissos.']],
+  ghes:[['GHE 01 – Administrativo','Trabalho predominantemente sentado com uso de computador.',['Assistente administrativo','Recepcionista'],[
+   ['monitor',{fonte:'Estação de trabalho com computador',prob:3,sev:2,recomendacao:'Realizar Avaliação Ergonômica Preliminar (AEP) e adequar mobiliário conforme NR-17'}],
+   ['sobrecarga',{fonte:'Demandas, prazos e organização do trabalho',prob:2,sev:3,recomendacao:'Aplicar questionário de fatores psicossociais e definir canal de escuta'}],
+   ['queda_nivel',{fonte:'Circulação em áreas internas',prob:2,sev:2,epc:'Piso antiderrapante, sinalização de piso molhado'}]]]]},
+ oficina:{nome:'Oficina mecânica',grau:'3',atividade:'Serviços de manutenção e reparação mecânica de veículos automotores.',
+  setores:[['Oficina','Galpão com cobertura metálica, piso de concreto, ventilação natural, elevadores automotivos.'],['Administrativo','Sala climatizada com mobiliário de escritório.']],
+  cargos:[['Mecânico de manutenção de automóveis','9144-05','Oficina',3,'Realiza diagnóstico, manutenção e reparo de motores, freios, suspensão e sistemas mecânicos de veículos.'],['Ajudante de mecânico','','Oficina',2,'Auxilia o mecânico, realiza limpeza de peças e organização de ferramentas.'],['Assistente administrativo','4110-10','Administrativo',1,'Atendimento a clientes, orçamentos e rotinas administrativas.']],
+  ghes:[['GHE 01 – Oficina','Atividades de manutenção mecânica em veículos.',['Mecânico de manutenção de automóveis','Ajudante de mecânico'],[
+   ['ruido',{fonte:'Ferramentas pneumáticas, compressor, motores em funcionamento',avaliacao:'Quantitativa',intensidade:'82',epi:'Protetor auricular tipo plug',ca:'',prob:3,sev:3,recomendacao:'Manter Programa de Conservação Auditiva e enclausurar compressor'}],
+   ['oleos',{fonte:'Troca de óleo e manuseio de peças',epi:'Luva nitrílica e creme de proteção',prob:4,sev:2}],
+   ['solventes',{fonte:'Limpeza de peças com thinner/desengraxante',epi:'Luva nitrílica, respirador com filtro para vapores orgânicos',prob:3,sev:3,recomendacao:'Substituir solvente por desengraxante à base d\'água'}],
+   ['cargas',{fonte:'Movimentação de pneus, baterias e peças',prob:3,sev:3,recomendacao:'Disponibilizar carrinhos e talhas para movimentação'}],
+   ['maquinas',{fonte:'Elevador automotivo, esmeril, prensa',epc:'Proteções fixas e dispositivos de parada de emergência',prob:2,sev:4,recomendacao:'Realizar inventário e apreciação de risco de máquinas conforme NR-12'}],
+   ['cortes',{fonte:'Ferramentas manuais e peças metálicas',epi:'Luva de vaqueta',prob:3,sev:2}]]],
+   ['GHE 02 – Administrativo','Atendimento e rotinas administrativas.',['Assistente administrativo'],[
+   ['monitor',{fonte:'Estação de trabalho com computador',prob:3,sev:2}],
+   ['violencia',{fonte:'Atendimento a clientes insatisfeitos',prob:2,sev:2,recomendacao:'Treinamento em atendimento e protocolo para situações de conflito'}]]]]},
+ obra:{nome:'Construção civil (obra)',grau:'3',atividade:'Construção de edifícios.',
+  setores:[['Canteiro de obras','Área externa a céu aberto, andaimes, betoneira, serra circular.']],
+  cargos:[['Pedreiro','7152-10','Canteiro de obras',4,'Executa alvenaria, concretagem, reboco e assentamento de pisos.'],['Servente de obras','7170-20','Canteiro de obras',6,'Prepara argamassa, transporta materiais e auxilia os oficiais.']],
+  ghes:[['GHE 01 – Operacional de obra','Execução de serviços de construção civil no canteiro.',['Pedreiro','Servente de obras'],[
+   ['ruido',{fonte:'Betoneira, serra circular, martelete',avaliacao:'Quantitativa',intensidade:'88',epi:'Protetor auricular tipo concha',prob:4,sev:3,recomendacao:'Enclausurar serra circular e implantar rodízio de tarefas'}],
+   ['silica',{fonte:'Corte de blocos, concreto e cerâmica',epi:'Respirador PFF2',epiEficaz:'Não',prob:4,sev:4,recomendacao:'Utilizar corte a úmido e aspiração localizada'}],
+   ['calor',{fonte:'Trabalho a céu aberto',exposicao:'Habitual e intermitente',prob:3,sev:3,recomendacao:'Avaliar IBUTG e definir regime de pausas e hidratação'}],
+   ['rad_nion',{agente:'Radiação ultravioleta solar',fonte:'Trabalho a céu aberto',epi:'Protetor solar, chapéu com proteção de nuca',prob:4,sev:2}],
+   ['cargas',{fonte:'Transporte de sacos de cimento, blocos e argamassa',prob:4,sev:3,recomendacao:'Utilizar guincho e carrinhos; limitar peso por pessoa'}],
+   ['altura',{fonte:'Andaimes, lajes e periferia da edificação',epc:'Guarda-corpo, linha de vida',epi:'Cinto paraquedista com talabarte duplo',prob:3,sev:5,recomendacao:'Emitir Permissão de Trabalho e treinar equipe em NR-35'}],
+   ['queda_nivel',{fonte:'Entulho e piso irregular',prob:3,sev:2,recomendacao:'Manter limpeza e organização do canteiro'}]]]]}
+};
+
+/* ================== ESTADO ================== */
+const LS='risco360_v1';
+const $=id=>document.getElementById(id);
+const dlg=$('dlg');
+let S=load();
+let ui={emp:null,tab:'dados',ghe:null,q:''};
+function def(){return{consultoria:{nome:'',cnpj:'',resp:'',formacao:'Técnico(a) em Segurança do Trabalho',registro:'',medico:'',crm:'',eng:'',crea:'',tel:'',email:'',cidade:''},empresas:[]}}
+function load(){try{return JSON.parse(localStorage.getItem(LS))||def()}catch(e){return def()}}
+function save(){localStorage.setItem(LS,JSON.stringify(S))}
+const uid=()=>Math.random().toString(36).slice(2,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const v=id=>{const el=$(id);return el?el.value:''};
+const hojeISO=()=>new Date().toISOString().slice(0,10);
+const fmtD=iso=>{if(!iso)return'—';const[y,m,d]=iso.split('-');return`${d}/${m}/${y}`};
+const addAnos=(iso,n)=>{const d=new Date(iso+'T12:00');d.setFullYear(d.getFullYear()+n);return d.toISOString().slice(0,10)};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500)}
+function emp(){return S.empresas.find(e=>e.id===ui.emp)}
+function curGHE(){return emp()?.ghes.find(g=>g.id===ui.ghe)}
+function nivel(p,s){const n=p*s;if(n>=15)return{n,l:'Crítico',c:'critico'};if(n>=10)return{n,l:'Alto',c:'alto'};if(n>=5)return{n,l:'Moderado',c:'moderado'};return{n,l:'Baixo',c:'baixo'}}
+const nvBadge=r=>{const x=nivel(+r.prob,+r.sev);return`<span class="badge nv-${x.c}">${x.l} (${x.n})</span>`};
+const tipoBadge=t=>`<span class="badge" style="background:${TIPOS[t]?.c||'#999'}">${TIPOS[t]?.n||t}</span>`;
+const qtdGHE=(e,g)=>e.cargos.filter(c=>g.cargoIds.includes(c.id)).reduce((s,c)=>s+(+c.qtd||0),0);
+const endereco=e=>[e.endereco,e.cidade&&(e.cidade+(e.uf?'/'+e.uf:'')),e.cep&&('CEP '+e.cep)].filter(Boolean).join(' – ');
+
+function novaEmpresa(razao='',cnpj=''){return{id:uid(),razao,fantasia:'',cnpj,cnae:'',cnaeDesc:'',grau:'',endereco:'',cidade:'',uf:'',cep:'',atividade:'',jornada:'44 horas semanais',contato:'',dataElab:hojeISO(),setores:[],cargos:[],ghes:[],acoes:[]}}
+function novoRisco(agId,o={}){const a=AG[agId]||{};return Object.assign({id:uid(),tipo:a.tipo||'fisico',agenteId:agId||'',agente:a.nome||'',fonte:'',exposicao:'Habitual e permanente',avaliacao:(a.lt!==undefined&&a.lt!=='')?'Quantitativa':'Qualitativa',intensidade:'',unidade:a.unid||'',limite:a.lt??'',tecnica:a.tecnica||'',danos:a.danos||'',esocial:a.esocial||'',prob:3,sev:3,epc:'',epi:'',ca:'',epiEficaz:'Sim',recomendacao:''},o)}
+function aplicarModelo(e,key){
+  const m=MODELOS[key];if(!m)return;
+  e.grau=e.grau||m.grau;e.atividade=e.atividade||m.atividade;
+  const setId={};m.setores.forEach(([nome,descricao])=>{const s={id:uid(),nome,descricao};e.setores.push(s);setId[nome]=s.id});
+  const carId={};m.cargos.forEach(([nome,cbo,setor,qtd,descricao])=>{const c={id:uid(),nome,cbo,setorId:setId[setor]||'',qtd,descricao};e.cargos.push(c);carId[nome]=c.id});
+  m.ghes.forEach(([nome,descricao,cargos,riscos])=>{
+    const g={id:uid(),nome,descricao,cargoIds:cargos.map(c=>carId[c]).filter(Boolean),riscos:[]};
+    riscos.forEach(([ag,o])=>{const r=novoRisco(ag,o);g.riscos.push(r);if(r.recomendacao)e.acoes.push({id:uid(),gheId:g.id,riscoId:r.id,descricao:r.recomendacao,responsavel:'',prazo:'',status:'Pendente'})});
+    e.ghes.push(g)});
+}
+
+/* ================== LAYOUT ================== */
+function render(){renderSide();renderMain()}
+function go(id,tab){ui.emp=id;ui.tab=tab||'dados';ui.ghe=null;render();window.scrollTo(0,0)}
+function renderSide(){
+  $('side').innerHTML=`<div class="brand">Risco<b>360</b><small>PGR · PCMSO · LTCAT</small></div>
+  <button class="side-btn ${!ui.emp?'act':''}" onclick="go(null)">🏠 Painel</button>
+  <button class="side-btn" onclick="dlgConsultoria()">🏢 Minha consultoria</button>
+  <div class="side-h">Empresas atendidas <button class="mini" onclick="dlgNovaEmpresa()">+ Nova</button></div>
+  <input class="side-search" placeholder="Buscar empresa..." value="${esc(ui.q)}" oninput="ui.q=this.value;renderSideList()">
+  <div id="sideList"></div>
+  <div class="side-foot"><button onclick="exportar()" title="Baixar um arquivo com todos os dados">⬇ Backup</button><label title="Restaurar a partir de um backup">⬆ Restaurar<input type="file" accept=".json" hidden onchange="importar(this)"></label></div>`;
+  renderSideList();
+}
+function renderSideList(){
+  const q=ui.q.toLowerCase();
+  const l=S.empresas.filter(e=>(e.razao+' '+e.fantasia+' '+e.cnpj).toLowerCase().includes(q));
+  $('sideList').innerHTML=l.map(e=>`<button class="side-btn side-emp ${e.id===ui.emp?'act':''}" onclick="go('${e.id}')">${esc(e.fantasia||e.razao||'(sem nome)')}<small>${esc(e.cnpj||'')}</small></button>`).join('')||'<p style="opacity:.6;font-size:12px;padding:0 8px">Nenhuma empresa ainda.</p>';
+}
+function renderMain(){
+  const e=emp();
+  if(!e){$('main').innerHTML=painel();return}
+  const tabs=[['dados','Dados da empresa'],['setores','Setores e cargos'],['ghe','GHE e riscos'],['plano','Plano de ação'],['docs','Documentos']];
+  const body={dados:tabDados,setores:tabSetores,ghe:tabGHE,plano:tabPlano,docs:tabDocs}[ui.tab](e);
+  $('main').innerHTML=`<h1 class="pg">${esc(e.fantasia||e.razao||'Nova empresa')}</h1>
+  <p class="sub">${esc(e.cnpj||'CNPJ não informado')} ${e.grau?'· Grau de risco '+esc(e.grau):''} · ${e.ghes.length} GHE · ${e.ghes.reduce((s,g)=>s+g.riscos.length,0)} riscos</p>
+  <div class="tabs">${tabs.map(([k,n])=>`<button class="${ui.tab===k?'act':''}" onclick="ui.tab='${k}';renderMain()">${n}</button>`).join('')}</div>${body}`;
+}
+
+/* ================== PAINEL ================== */
+function painel(){
+  const tot=S.empresas.length,ghes=S.empresas.reduce((s,e)=>s+e.ghes.length,0),riscos=S.empresas.reduce((s,e)=>s+e.ghes.reduce((a,g)=>a+g.riscos.length,0),0);
+  const hoje=hojeISO();const atras=[];S.empresas.forEach(e=>e.acoes.forEach(a=>{if(a.status!=='Concluída'&&a.prazo&&a.prazo<hoje)atras.push([e,a])}));
+  const c=S.consultoria;
+  return`<h1 class="pg">Painel</h1><p class="sub">${c.nome?esc(c.nome):'Configure sua consultoria em <button class="link" onclick="dlgConsultoria()">Minha consultoria</button>'}</p>
+  <div class="stats"><div class="stat"><b>${tot}</b><span>Empresas atendidas</span></div><div class="stat"><b>${ghes}</b><span>GHE cadastrados</span></div><div class="stat"><b>${riscos}</b><span>Riscos inventariados</span></div><div class="stat"><b style="color:${atras.length?'#c62828':'#127369'}">${atras.length}</b><span>Ações atrasadas</span></div></div>
+  ${tot?`<div class="card"><h3>Empresas</h3><table class="t"><tr><th>Empresa</th><th>CNPJ</th><th>GHE</th><th>Riscos</th><th>Ações pendentes</th><th>Elaboração</th><th>Revisão do PGR</th></tr>
+   ${S.empresas.map(e=>{const rev=e.dataElab?addAnos(e.dataElab,2):'';const pend=e.acoes.filter(a=>a.status!=='Concluída').length;return`<tr style="cursor:pointer" onclick="go('${e.id}')"><td><b>${esc(e.fantasia||e.razao)}</b></td><td>${esc(e.cnpj)}</td><td>${e.ghes.length}</td><td>${e.ghes.reduce((a,g)=>a+g.riscos.length,0)}</td><td>${pend}</td><td>${fmtD(e.dataElab)}</td><td>${rev&&rev<=hoje?'<span class="badge nv-critico">Vencida</span> ':''}${fmtD(rev)}</td></tr>`}).join('')}</table></div>`:''}
+  ${atras.length?`<div class="card"><h3>⚠ Ações atrasadas</h3>${atras.map(([e,a])=>`<div class="alerta"><b>${esc(e.fantasia||e.razao)}</b> — ${esc(a.descricao)} (prazo ${fmtD(a.prazo)})</div>`).join('')}</div>`:''}
+  <div class="card"><h3>Como usar</h3><ol class="steps">
+   <li>Preencha <b>Minha consultoria</b> (responsável técnico, médico coordenador e engenheiro). Esses dados entram na assinatura dos documentos.</li>
+   <li>Cadastre uma <b>empresa</b>. Dá para buscar pelo CNPJ e começar de um <b>modelo por atividade</b> (escritório, oficina, obra).</li>
+   <li>Cadastre os <b>setores e cargos</b> e agrupe os cargos em <b>GHE</b>.</li>
+   <li>Lance os <b>riscos</b> de cada GHE uma única vez: a matriz, o plano de ação, os exames e a conclusão do LTCAT saem automaticamente.</li>
+   <li>Em <b>Documentos</b>, gere o PGR, o PCMSO e o LTCAT e salve em PDF.</li></ol>
+   ${tot?'':'<p><button class="pri" onclick="carregarExemplo()">Carregar empresa de exemplo</button> <button onclick="dlgNovaEmpresa()">Cadastrar minha primeira empresa</button></p>'}</div>
+  <p class="muted" style="font-size:12px">Protótipo: os dados ficam salvos apenas neste navegador. Faça backups com o botão ⬇ Backup. Os exames e as conclusões sugeridas devem ser validados pelo profissional responsável.</p>`;
+}
+
+/* ================== DADOS ================== */
+const inp=(id,label,val,cls='',extra='')=>`<label class="${cls}">${label}<input id="${id}" value="${esc(val)}" ${extra}></label>`;
+const sel=(id,label,opts,val,cls='',extra='')=>`<label class="${cls}">${label}<select id="${id}" ${extra}>${opts.map(o=>{const[k,n]=Array.isArray(o)?o:[o,o];return`<option value="${esc(k)}" ${String(k)===String(val)?'selected':''}>${esc(n)}</option>`}).join('')}</select></label>`;
+const ta=(id,label,val,cls='span4',extra='')=>`<label class="${cls}">${label}<textarea id="${id}" ${extra}>${esc(val)}</textarea></label>`;
+function setE(k,val){const e=emp();e[k]=val;save();if(['razao','fantasia','cnpj','grau'].includes(k)){renderSideList();const s=document.querySelector('.sub');if(s)renderMainHeaderOnly()}}
+function renderMainHeaderOnly(){const e=emp();document.querySelector('h1.pg').textContent=e.fantasia||e.razao||'Nova empresa'}
+function tabDados(e){
+  const f=(k,l,cls='')=>inp('e_'+k,l,e[k],cls,`onchange="setE('${k}',this.value)"`);
+  return`<div class="card"><h3>Identificação</h3><div class="fg">
+   <label class="span2">CNPJ<div class="row" style="margin:0"><input id="e_cnpj" value="${esc(e.cnpj)}" onchange="setE('cnpj',this.value)" placeholder="00.000.000/0000-00"><button onclick="buscarCNPJ()" title="Consulta dados públicos na BrasilAPI">Buscar</button></div></label>
+   ${f('razao','Razão social','span2')}${f('fantasia','Nome fantasia','span2')}${f('cnae','CNAE principal')}
+   ${sel('e_grau','Grau de risco (NR-4)',[['','—'],'1','2','3','4'],e.grau,'',`onchange="setE('grau',this.value)"`)}
+   ${f('cnaeDesc','Descrição do CNAE','span4')}${f('endereco','Endereço','span2')}${f('cidade','Cidade')}${f('uf','UF')}${f('cep','CEP')}${f('jornada','Jornada de trabalho')}${f('contato','Contato na empresa','span2')}
+   ${ta('e_atividade','Descrição da atividade da empresa',e.atividade,'span4',`onchange="setE('atividade',this.value)"`)}
+   ${inp('e_dataElab','Data de elaboração dos documentos',e.dataElab,'','type="date" onchange="setE(\'dataElab\',this.value)"')}
+  </div></div>
+  <div class="card"><h3>Começar a partir de um modelo</h3><p class="muted" style="margin-top:0">Adiciona setores, cargos, GHE e riscos típicos da atividade. Depois é só ajustar.</p>
+   <div class="row">${Object.entries(MODELOS).map(([k,m])=>`<button onclick="usarModelo('${k}')">+ ${m.nome}</button>`).join('')}</div></div>
+  <button onclick="delEmpresa()" style="color:#c62828">Excluir empresa</button>`;
+}
+function usarModelo(k){const e=emp();aplicarModelo(e,k);save();toast('Modelo aplicado: '+MODELOS[k].nome);ui.tab='ghe';render()}
+async function buscarCNPJ(){
+  const e=emp();e.cnpj=v('e_cnpj');const c=e.cnpj.replace(/\D/g,'');
+  if(c.length!==14)return toast('Informe um CNPJ com 14 dígitos');
+  toast('Consultando...');
+  try{const r=await fetch('https://brasilapi.com.br/api/cnpj/v1/'+c);if(!r.ok)throw 0;const d=await r.json();
+    Object.assign(e,{razao:d.razao_social||e.razao,fantasia:d.nome_fantasia||e.fantasia,cnae:String(d.cnae_fiscal||e.cnae),cnaeDesc:d.cnae_fiscal_descricao||e.cnaeDesc,
+      endereco:[[d.descricao_tipo_de_logradouro,d.logradouro].filter(Boolean).join(' '),d.numero,d.complemento,d.bairro].filter(Boolean).join(', ')||e.endereco,cidade:d.municipio||e.cidade,uf:d.uf||e.uf,cep:d.cep||e.cep});
+    save();render();toast('Dados do CNPJ carregados. Confira o grau de risco no Anexo I da NR-4.');
+  }catch(x){toast('Não foi possível consultar o CNPJ agora')}
+}
+function delEmpresa(){const e=emp();if(!confirm(`Excluir "${e.razao||'empresa'}" e todos os seus dados? Isso não pode ser desfeito.`))return;S.empresas=S.empresas.filter(x=>x.id!==e.id);save();go(null)}
+
+/* ================== SETORES E CARGOS ================== */
+function upd(coll,id,k,val,rerender){const o=emp()[coll].find(x=>x.id===id);o[k]=val;save();if(rerender)renderMain()}
+function del(coll,id){const e=emp();if(!confirm('Excluir este item?'))return;e[coll]=e[coll].filter(x=>x.id!==id);if(coll==='cargos')e.ghes.forEach(g=>g.cargoIds=g.cargoIds.filter(c=>c!==id));save();renderMain()}
+function addSetor(){emp().setores.push({id:uid(),nome:'Novo setor',descricao:''});save();renderMain()}
+function addCargo(){const e=emp();e.cargos.push({id:uid(),nome:'Novo cargo',cbo:'',setorId:e.setores[0]?.id||'',qtd:1,descricao:''});save();renderMain()}
+function tabSetores(e){
+  return`<div class="card"><h3>Setores / ambientes de trabalho</h3>
+  ${e.setores.map(s=>`<div class="row"><input style="width:220px" value="${esc(s.nome)}" onchange="upd('setores','${s.id}','nome',this.value)"><input class="grow" placeholder="Descrição do ambiente: área, piso, cobertura, iluminação, ventilação" value="${esc(s.descricao)}" onchange="upd('setores','${s.id}','descricao',this.value)"><button class="del" onclick="del('setores','${s.id}')">✕</button></div>`).join('')||'<p class="muted">Nenhum setor cadastrado.</p>'}
+  <button onclick="addSetor()">+ Setor</button></div>
+  <div class="card"><h3>Cargos / funções</h3>
+  <table class="t"><tr><th style="width:22%">Cargo</th><th style="width:10%">CBO</th><th style="width:16%">Setor</th><th style="width:7%">Nº func.</th><th>Descrição das atividades</th><th></th></tr>
+  ${e.cargos.map(c=>`<tr><td><input value="${esc(c.nome)}" onchange="upd('cargos','${c.id}','nome',this.value)"></td><td><input value="${esc(c.cbo)}" placeholder="0000-00" onchange="upd('cargos','${c.id}','cbo',this.value)"></td>
+   <td><select onchange="upd('cargos','${c.id}','setorId',this.value)"><option value="">—</option>${e.setores.map(s=>`<option value="${s.id}" ${s.id===c.setorId?'selected':''}>${esc(s.nome)}</option>`).join('')}</select></td>
+   <td><input type="number" min="0" value="${esc(c.qtd)}" onchange="upd('cargos','${c.id}','qtd',this.value)"></td><td><textarea rows="2" style="min-height:38px" onchange="upd('cargos','${c.id}','descricao',this.value)">${esc(c.descricao)}</textarea></td><td><button class="del" onclick="del('cargos','${c.id}')">✕</button></td></tr>`).join('')}</table>
+  ${e.cargos.length?'':'<p class="muted">Nenhum cargo cadastrado.</p>'}<button onclick="addCargo()">+ Cargo</button>
+  <p class="muted" style="font-size:12px">Total de funcionários: <b>${e.cargos.reduce((s,c)=>s+(+c.qtd||0),0)}</b></p></div>`;
+}
+
+/* ================== GHE E RISCOS ================== */
+function addGHE(){const e=emp();const g={id:uid(),nome:`GHE ${String(e.ghes.length+1).padStart(2,'0')} – `,descricao:'',cargoIds:[],riscos:[]};e.ghes.push(g);ui.ghe=g.id;save();renderMain()}
+function setG(k,val){curGHE()[k]=val;save();if(k==='nome')renderMain()}
+function toggleCargo(cid){const g=curGHE();g.cargoIds=g.cargoIds.includes(cid)?g.cargoIds.filter(x=>x!==cid):[...g.cargoIds,cid];save();renderMain()}
+function dupGHE(){const e=emp(),g=curGHE();const n=JSON.parse(JSON.stringify(g));n.id=uid();n.nome=g.nome+' (cópia)';n.riscos.forEach(r=>r.id=uid());e.ghes.push(n);ui.ghe=n.id;save();renderMain();toast('GHE duplicado')}
+function delGHE(){const e=emp(),g=curGHE();if(!confirm(`Excluir "${g.nome}" e seus riscos?`))return;e.ghes=e.ghes.filter(x=>x.id!==g.id);e.acoes=e.acoes.filter(a=>a.gheId!==g.id);ui.ghe=null;save();renderMain()}
+function delRisco(rid){const e=emp(),g=curGHE();if(!confirm('Excluir este risco?'))return;g.riscos=g.riscos.filter(r=>r.id!==rid);e.acoes=e.acoes.filter(a=>a.riscoId!==rid);save();renderMain()}
+function matrizHTML(riscos){
+  let h='<div class="matriz"><div></div>'+[1,2,3,4,5].map(p=>`<div class="lbl" style="text-align:center;padding:0">P${p}</div>`).join('');
+  for(let s=5;s>=1;s--){h+=`<div class="lbl">Sev. ${s}</div>`;for(let p=1;p<=5;p++){const n=nivel(p,s),q=riscos.filter(r=>+r.prob===p&&+r.sev===s).length;h+=`<div class="c nv-${n.c}" style="opacity:${q?1:.35}" title="${n.l} (${n.n})">${q||''}</div>`}}
+  return h+'</div>';
+}
+function examesGHE(g){
+  const m=new Map([['Exame clínico (anamnese ocupacional e exame físico)',{per:g.riscos.length?'Anual (a critério médico)':'A cada 2 anos',origem:['Todos (NR-7)']}]]);
+  g.riscos.forEach(r=>(AG[r.agenteId]?.exames||[]).forEach(([ex,per])=>{if(!m.has(ex))m.set(ex,{per,origem:[]});m.get(ex).origem.push(AG[r.agenteId].nome)}));
+  return[...m];
+}
+function tabGHE(e){
+  if(!e.ghes.find(g=>g.id===ui.ghe))ui.ghe=e.ghes[0]?.id;
+  const g=e.ghes.find(x=>x.id===ui.ghe);
+  return`<div class="ghe-wrap"><div class="card ghe-list">${e.ghes.map(x=>`<button class="ghe-item ${x.id===ui.ghe?'act':''}" onclick="ui.ghe='${x.id}';renderMain()"><b>${esc(x.nome)}</b><small>${x.cargoIds.length} cargo(s) · ${qtdGHE(e,x)} func. · ${x.riscos.length} risco(s)</small></button>`).join('')}
+   <button class="pri" style="width:100%;margin-top:6px" onclick="addGHE()">+ Novo GHE</button></div>
+   <div class="grow">${g?gheDetail(e,g):`<div class="card"><p class="muted">Crie um Grupo Homogêneo de Exposição para agrupar os cargos que têm a mesma exposição a riscos.</p>${e.cargos.length?'':'<div class="alerta">Cadastre antes os cargos na aba <b>Setores e cargos</b>, ou use um modelo na aba <b>Dados da empresa</b>.</div>'}</div>`}</div></div>`;
+}
+function gheDetail(e,g){
+  const ex=examesGHE(g);
+  return`<div class="card"><div class="fg">${inp('g_nome','Nome do GHE',g.nome,'span2',`onchange="setG('nome',this.value)"`)}
+   <div class="span2" style="display:flex;gap:6px;justify-content:flex-end;align-items:flex-end"><button onclick="dupGHE()">Duplicar</button><button onclick="delGHE()" style="color:#c62828">Excluir GHE</button></div>
+   ${ta('g_desc','Descrição das atividades / condições de exposição do grupo',g.descricao,'span4',`onchange="setG('descricao',this.value)"`)}
+   <div class="span4"><label>Cargos que compõem o GHE</label><div class="chips" style="margin-top:6px">${e.cargos.map(c=>`<label class="chip ${g.cargoIds.includes(c.id)?'on':''}"><input type="checkbox" ${g.cargoIds.includes(c.id)?'checked':''} onchange="toggleCargo('${c.id}')">${esc(c.nome)} <span class="muted">(${c.qtd||0})</span></label>`).join('')||'<span class="muted">Nenhum cargo cadastrado.</span>'}</div></div></div></div>
+  <div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Inventário de riscos</h3><button class="pri" onclick="dlgRisco()">+ Adicionar risco</button></div>
+   ${g.riscos.length?`<table class="t"><tr><th>Tipo</th><th>Agente / perigo</th><th>Fonte geradora</th><th>Exposição</th><th>Medição / LT</th><th>Nível</th><th></th></tr>
+   ${g.riscos.map(r=>`<tr><td>${tipoBadge(r.tipo)}</td><td><b>${esc(r.agente)}</b><br><span class="muted" style="font-size:12px">${esc(r.danos)}</span></td><td>${esc(r.fonte)}</td><td>${esc(r.exposicao)}</td>
+    <td>${r.intensidade?`${esc(r.intensidade)} ${esc(r.unidade)}${r.limite!==''?` / LT ${esc(r.limite)}`:''}`:`<span class="muted">${esc(r.avaliacao)}</span>`}</td><td>${nvBadge(r)}</td>
+    <td style="white-space:nowrap"><button class="link" onclick="dlgRisco('${r.id}')">editar</button><button class="del" onclick="delRisco('${r.id}')">✕</button></td></tr>`).join('')}</table>`:'<p class="muted">Nenhum risco lançado para este GHE.</p>'}</div>
+  <div class="ghe-wrap"><div class="card"><h3>Matriz de risco</h3>${matrizHTML(g.riscos)}<p class="muted" style="font-size:11px;margin-bottom:0">P = probabilidade · Sev. = severidade</p></div>
+   <div class="card grow"><h3>Exames sugeridos para o PCMSO</h3><table class="t"><tr><th>Exame</th><th>Periodicidade</th><th>Motivo</th></tr>${ex.map(([n,o])=>`<tr><td>${esc(n)}</td><td>${esc(o.per)}</td><td class="muted">${esc([...new Set(o.origem)].join('; '))}</td></tr>`).join('')}</table><p class="muted" style="font-size:11px;margin-bottom:0">Gerado automaticamente a partir dos riscos. A validação é do médico responsável pelo PCMSO.</p></div></div>`;
+}
+function agOpts(tipo,sel){return AGENTES.filter(a=>a.tipo===tipo).map(a=>`<option value="${a.id}" ${a.id===sel?'selected':''}>${esc(a.nome)}</option>`).join('')+`<option value="" ${!sel?'selected':''}>Outro (descrever)</option>`}
+function dlgRisco(rid){
+  const g=curGHE();const r=rid?g.riscos.find(x=>x.id===rid):novoRisco('ruido');
+  const body=`<div class="fg">
+   <div class="sep">Identificação do perigo</div>
+   ${sel('r_tipo','Tipo de risco',Object.entries(TIPOS).map(([k,t])=>[k,t.n]),r.tipo,'','onchange="rTipo()"')}
+   <label class="span3">Agente / perigo (biblioteca)<select id="r_agenteId" onchange="rAgente()">${agOpts(r.tipo,r.agenteId)}</select></label>
+   ${inp('r_agente','Descrição do agente',r.agente,'span2')}${inp('r_fonte','Fonte geradora / circunstância',r.fonte,'span2')}
+   ${ta('r_danos','Possíveis danos à saúde',r.danos)}
+   <div class="sep">Exposição e avaliação</div>
+   ${sel('r_exposicao','Tipo de exposição',EXPO,r.exposicao,'span2')}${sel('r_avaliacao','Avaliação',['Qualitativa','Quantitativa'],r.avaliacao)}${inp('r_esocial','Cód. eSocial (Tabela 24)',r.esocial)}
+   ${inp('r_intensidade','Intensidade / concentração medida',r.intensidade)}${inp('r_unidade','Unidade',r.unidade)}${inp('r_limite','Limite de tolerância',r.limite)}${inp('r_tecnica','Técnica / metodologia',r.tecnica)}
+   <div class="sep">Gradação do risco</div>
+   ${sel('r_prob','Probabilidade',[1,2,3,4,5].map(i=>[i,PROB[i]]),r.prob,'','onchange="rNivel()"')}${sel('r_sev','Severidade',[1,2,3,4,5].map(i=>[i,SEV[i]]),r.sev,'','onchange="rNivel()"')}
+   <label class="span2">Nível de risco<div id="r_nivel" style="padding-top:6px">${nvBadge(r)}</div></label>
+   <div class="sep">Medidas de controle</div>
+   ${ta('r_epc','Medidas de proteção coletiva / administrativas existentes',r.epc,'span2')}${inp('r_epi','EPI utilizado',r.epi)}${inp('r_ca','Nº do CA',r.ca)}
+   ${sel('r_epiEficaz','EPI eficaz?',['Sim','Não','Não se aplica'],r.epiEficaz)}
+   ${ta('r_rec','Medidas recomendadas (vão para o plano de ação)',r.recomendacao,'span3')}
+  </div>`;
+  openDlg(rid?'Editar risco':'Novo risco — '+esc(g.nome),body,()=>{
+    const o={tipo:v('r_tipo'),agenteId:v('r_agenteId'),agente:v('r_agente').trim(),fonte:v('r_fonte'),danos:v('r_danos'),exposicao:v('r_exposicao'),avaliacao:v('r_avaliacao'),esocial:v('r_esocial'),
+      intensidade:v('r_intensidade').replace(',','.'),unidade:v('r_unidade'),limite:v('r_limite').replace(',','.'),tecnica:v('r_tecnica'),prob:+v('r_prob'),sev:+v('r_sev'),epc:v('r_epc'),epi:v('r_epi'),ca:v('r_ca'),epiEficaz:v('r_epiEficaz'),recomendacao:v('r_rec').trim()};
+    if(!o.agente){toast('Descreva o agente');return false}
+    Object.assign(r,o);if(!rid)g.riscos.push(r);
+    const e=emp();const ac=e.acoes.find(a=>a.riscoId===r.id);
+    if(r.recomendacao){if(ac)ac.descricao=r.recomendacao;else e.acoes.push({id:uid(),gheId:g.id,riscoId:r.id,descricao:r.recomendacao,responsavel:'',prazo:'',status:'Pendente'})}
+    save();renderMain();toast('Risco salvo');
+  });
+}
+function rTipo(){const t=v('r_tipo');$('r_agenteId').innerHTML=agOpts(t,AGENTES.find(a=>a.tipo===t)?.id||'');rAgente()}
+function rAgente(){const a=AG[v('r_agenteId')]||{};const set=(id,val)=>$(id).value=val??'';
+  set('r_agente',a.nome||'');set('r_unidade',a.unid);set('r_limite',a.lt);set('r_danos',a.danos);set('r_tecnica',a.tecnica);set('r_esocial',a.esocial);
+  $('r_avaliacao').value=(a.lt!==undefined&&a.lt!=='')?'Quantitativa':'Qualitativa'}
+function rNivel(){$('r_nivel').innerHTML=nvBadge({prob:v('r_prob'),sev:v('r_sev')})}
+
+/* ================== PLANO DE AÇÃO ================== */
+function addAcao(){const e=emp();e.acoes.push({id:uid(),gheId:e.ghes[0]?.id||'',riscoId:'',descricao:'',responsavel:'',prazo:'',status:'Pendente'});save();renderMain()}
+function tabPlano(e){
+  const hoje=hojeISO();
+  const ref=a=>{const g=e.ghes.find(x=>x.id===a.gheId);const r=g?.riscos.find(x=>x.id===a.riscoId);return{g,r}};
+  const ord=[...e.acoes].sort((a,b)=>{const ra=ref(a).r,rb=ref(b).r;return(rb?rb.prob*rb.sev:0)-(ra?ra.prob*ra.sev:0)});
+  return`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Plano de ação (ordenado por nível de risco)</h3><button class="pri" onclick="addAcao()">+ Ação</button></div>
+  ${ord.length?`<table class="t"><tr><th style="width:32%">Ação</th><th>GHE / risco</th><th>Responsável</th><th>Prazo</th><th>Status</th><th></th></tr>
+  ${ord.map(a=>{const{g,r}=ref(a);const late=a.status!=='Concluída'&&a.prazo&&a.prazo<hoje;return`<tr style="${late?'background:#fff3f3':''}">
+   <td><textarea rows="2" style="min-height:38px" onchange="upd('acoes','${a.id}','descricao',this.value)">${esc(a.descricao)}</textarea></td>
+   <td>${r?`${esc(g.nome)}<br>${nvBadge(r)} <span class="muted" style="font-size:12px">${esc(r.agente)}</span>`:`<select onchange="upd('acoes','${a.id}','gheId',this.value)">${e.ghes.map(x=>`<option value="${x.id}" ${x.id===a.gheId?'selected':''}>${esc(x.nome)}</option>`).join('')}</select>`}</td>
+   <td><input value="${esc(a.responsavel)}" onchange="upd('acoes','${a.id}','responsavel',this.value)"></td>
+   <td><input type="date" value="${esc(a.prazo)}" onchange="upd('acoes','${a.id}','prazo',this.value,true)">${late?'<span class="badge nv-critico">Atrasada</span>':''}</td>
+   <td><select onchange="upd('acoes','${a.id}','status',this.value,true)">${['Pendente','Em andamento','Concluída'].map(s=>`<option ${s===a.status?'selected':''}>${s}</option>`).join('')}</select></td>
+   <td><button class="del" onclick="del('acoes','${a.id}')">✕</button></td></tr>`}).join('')}</table>`:'<p class="muted">Nenhuma ação ainda. As medidas recomendadas nos riscos aparecem aqui automaticamente.</p>'}</div>`;
+}
+
+/* ================== DOCUMENTOS ================== */
+function pendencias(e,tipo){
+  const c=S.consultoria,p=[];
+  if(!e.razao)p.push('Razão social não informada');if(!e.cnpj)p.push('CNPJ não informado');if(!e.grau)p.push('Grau de risco não informado');
+  if(!e.ghes.length)p.push('Nenhum GHE cadastrado');
+  e.ghes.forEach(g=>{if(!g.cargoIds.length)p.push(`${g.nome}: sem cargos vinculados`);if(!g.riscos.length)p.push(`${g.nome}: sem riscos lançados`)});
+  if(tipo==='PGR'&&!c.resp)p.push('Responsável técnico não cadastrado (Minha consultoria)');
+  if(tipo==='PCMSO'&&!c.medico)p.push('Médico responsável não cadastrado (Minha consultoria)');
+  if(tipo==='LTCAT'){if(!c.eng)p.push('Engenheiro de segurança ou médico do trabalho não cadastrado (Minha consultoria)');
+    e.ghes.forEach(g=>g.riscos.forEach(r=>{const x=ltcatAval(r);if(x&&x.res===null)p.push(`${g.nome}: ${r.agente} sem resultado de medição`)}))}
+  return p;
+}
+function tabDocs(e){
+  const d=[['PGR','Programa de Gerenciamento de Riscos','NR-1: inventário de riscos, matriz e plano de ação.'],['PCMSO','Programa de Controle Médico de Saúde Ocupacional','NR-7: exames por GHE definidos a partir dos riscos do PGR.'],['LTCAT','Laudo Técnico das Condições Ambientais do Trabalho','Previdência: análise dos agentes nocivos para aposentadoria especial.']];
+  return`<div class="docs">${d.map(([k,n,desc])=>{const p=pendencias(e,k);return`<div class="card doccard"><h3>${k}</h3><b style="font-size:13px">${n}</b><p>${desc}</p>
+   ${p.length?p.slice(0,6).map(x=>`<div class="alerta">${esc(x)}</div>`).join('')+(p.length>6?`<div class="muted">+${p.length-6} pendência(s)</div>`:''):'<div class="ok">Tudo pronto para gerar</div>'}
+   <button class="pri" style="margin-top:10px;width:100%" onclick="gerarDoc('${k}')">Gerar ${k}</button></div>`}).join('')}</div>
+   <p class="muted" style="font-size:12px">O documento abre em uma prévia. Use "Imprimir / Salvar PDF" e escolha "Salvar como PDF" como impressora.</p>`;
+}
+function ltcatAval(r){
+  if(!['fisico','quimico','biologico'].includes(r.tipo))return null;
+  const a=AG[r.agenteId]||{};
+  if(!a.anexoIV)return{res:false,txt:'Agente não relacionado no Anexo IV do Decreto 3.048/99.'};
+  if(r.exposicao!=='Habitual e permanente')return{res:false,txt:'Exposição não ocorre de forma habitual e permanente.'};
+  if(a.qualitativo){
+    if(r.tipo==='biologico')return{res:true,txt:`Avaliação qualitativa. Exposição habitual e permanente a agentes biológicos – código ${a.anexoIV}.`};
+    return{res:true,txt:`Agente reconhecidamente cancerígeno (LINACH grupo 1). Avaliação qualitativa; a utilização de EPC/EPI não elimina a nocividade – código ${a.anexoIV}.`};
+  }
+  const med=parseFloat(r.intensidade),lt=parseFloat(r.limite);
+  if(isNaN(med)||isNaN(lt))return{res:null,txt:'Necessária avaliação quantitativa para conclusão.'};
+  if(med<=lt)return{res:false,txt:`Resultado (${r.intensidade} ${r.unidade}) dentro do limite de tolerância (${r.limite}).`};
+  if(r.agenteId==='ruido')return{res:true,txt:`Resultado (${r.intensidade} ${r.unidade}) acima do limite (${r.limite}). Para ruído, o EPI não descaracteriza a especialidade (STF, ARE 664.335) – código ${a.anexoIV}.`};
+  if(r.epiEficaz==='Sim')return{res:false,txt:`Resultado acima do limite, porém neutralizado por EPI eficaz (CA ${r.ca||'—'}).`};
+  return{res:true,txt:`Resultado (${r.intensidade} ${r.unidade}) acima do limite (${r.limite}), sem neutralização por EPI eficaz – código ${a.anexoIV}.`};
+}
+function gerarDoc(tipo){
+  const e=emp();const html={PGR:docPGR,PCMSO:docPCMSO,LTCAT:docLTCAT}[tipo](e);
+  $('doc').innerHTML=`<div class="doc-bar"><span class="grow">${tipo} — ${esc(e.razao)}</span><button class="pri" onclick="window.print()">🖨 Imprimir / Salvar PDF</button><button onclick="$('doc').classList.remove('show')">Fechar</button></div><div class="paper">${html}</div>`;
+  $('doc').classList.add('show');$('doc').scrollTop=0;
+  document.title=`${tipo} - ${e.fantasia||e.razao}`;
+}
+window.addEventListener('afterprint',()=>document.title='Risco360 — PGR, PCMSO e LTCAT');
+// --- blocos comuns
+function capa(e,sigla,titulo,base){const c=S.consultoria;return`<section class="capa"><div class="top">${esc(c.nome||'')}</div><h1>${sigla}</h1><h2>${titulo}<br><small>${base}</small></h2>
+  <div class="emp"><b>${esc(e.razao)}</b>${e.fantasia?'<br>'+esc(e.fantasia):''}<br>CNPJ: ${esc(e.cnpj)}<br>${esc(endereco(e))}</div><div class="dt">${esc(e.cidade||c.cidade||'')}${e.cidade||c.cidade?', ':''}${fmtD(e.dataElab)}</div></section>`}
+function secEmpresa(e,n){const tot=e.cargos.reduce((s,c)=>s+(+c.qtd||0),0);return`<h2 class="sec">${n}. Identificação da empresa</h2><table class="kv">
+  <tr><th>Razão social</th><td>${esc(e.razao)}</td></tr><tr><th>Nome fantasia</th><td>${esc(e.fantasia)}</td></tr><tr><th>CNPJ</th><td>${esc(e.cnpj)}</td></tr>
+  <tr><th>CNAE principal</th><td>${esc(e.cnae)} ${e.cnaeDesc?'– '+esc(e.cnaeDesc):''}</td></tr><tr><th>Grau de risco (NR-4)</th><td>${esc(e.grau)}</td></tr>
+  <tr><th>Endereço</th><td>${esc(endereco(e))}</td></tr><tr><th>Atividade</th><td>${esc(e.atividade)}</td></tr><tr><th>Jornada</th><td>${esc(e.jornada)}</td></tr><tr><th>Nº de empregados</th><td>${tot}</td></tr></table>`}
+function secResp(n,nome,form,reg,titulo='Responsável técnico'){const c=S.consultoria;return`<h2 class="sec">${n}. ${titulo}</h2><table class="kv"><tr><th>Nome</th><td>${esc(nome)}</td></tr><tr><th>Formação</th><td>${esc(form)}</td></tr><tr><th>Registro profissional</th><td>${esc(reg)}</td></tr>
+  ${c.nome?`<tr><th>Empresa responsável</th><td>${esc(c.nome)}${c.cnpj?' – CNPJ '+esc(c.cnpj):''}</td></tr>`:''}${c.tel||c.email?`<tr><th>Contato</th><td>${esc([c.tel,c.email].filter(Boolean).join(' · '))}</td></tr>`:''}</table>`}
+function secGHE(e,n){return`<h2 class="sec">${n}. Grupos Homogêneos de Exposição (GHE)</h2>${e.ghes.map(g=>`<h3>${esc(g.nome)}</h3><p>${esc(g.descricao)}</p>
+  <table><tr><th>Cargo</th><th>CBO</th><th>Setor</th><th>Nº</th><th>Descrição das atividades</th></tr>${e.cargos.filter(c=>g.cargoIds.includes(c.id)).map(c=>`<tr><td>${esc(c.nome)}</td><td>${esc(c.cbo)}</td><td>${esc(e.setores.find(s=>s.id===c.setorId)?.nome||'')}</td><td>${esc(c.qtd)}</td><td>${esc(c.descricao)}</td></tr>`).join('')}</table>`).join('')}`}
+function assinatura(nome,cargo,reg){return`<div class="assin"><b>${esc(nome||'_______________________')}</b><br>${esc(cargo)}<br>${esc(reg)}</div>`}
+function tabelaMatriz(){let h='<table style="width:auto;text-align:center"><tr><th>Severidade \\ Probabilidade</th>'+[1,2,3,4,5].map(p=>`<th>${PROB[p]}</th>`).join('')+'</tr>';
+  for(let s=5;s>=1;s--){h+=`<tr><th>${SEV[s]}</th>`;for(let p=1;p<=5;p++){const n=nivel(p,s);h+=`<td class="nv-${n.c}" style="color:#fff;font-weight:700;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">${n.n}</td>`}h+='</tr>'}return h+'</table>'}
+
+function docPGR(e){
+  const c=S.consultoria;const todos=e.ghes.flatMap(g=>g.riscos);
+  return capa(e,'PGR','Programa de Gerenciamento de Riscos','NR-1 – Gerenciamento de Riscos Ocupacionais')+secEmpresa(e,1)+secResp(2,c.resp,c.formacao,c.registro)+
+  `<h2 class="sec">3. Objetivo e base legal</h2><p>Este Programa de Gerenciamento de Riscos (PGR) materializa o processo de Gerenciamento de Riscos Ocupacionais (GRO) da organização, conforme a Norma Regulamentadora nº 1 (NR-1), com o objetivo de identificar perigos, avaliar os riscos ocupacionais e estabelecer medidas de prevenção para proteger a segurança e a saúde dos trabalhadores. O PGR contempla os agentes físicos, químicos e biológicos, os fatores ergonômicos, os riscos de acidentes e os fatores de riscos psicossociais relacionados ao trabalho, e é composto pelo <b>inventário de riscos</b> e pelo <b>plano de ação</b>.</p>
+  <p>Referências: NR-1, NR-6, NR-9, NR-15, NR-17 e demais normas regulamentadoras aplicáveis, Normas de Higiene Ocupacional (NHO) da Fundacentro.</p>
+  <h2 class="sec">4. Metodologia de avaliação</h2><p>Os perigos foram identificados por meio de inspeção nos locais de trabalho, entrevistas com trabalhadores e análise das atividades. Cada risco foi avaliado pela combinação da <b>probabilidade</b> de ocorrência do dano e da <b>severidade</b> do dano, considerando as medidas de controle existentes. O nível de risco resulta do produto P × S:</p>
+  ${tabelaMatriz()}<table style="width:auto"><tr><th>Nível</th><th>Faixa</th><th>Ação requerida</th></tr><tr><td><span class="badge nv-baixo">Baixo</span></td><td>1 a 4</td><td>Manter as medidas de controle e monitorar.</td></tr><tr><td><span class="badge nv-moderado">Moderado</span></td><td>5 a 9</td><td>Implementar melhorias de forma planejada.</td></tr><tr><td><span class="badge nv-alto">Alto</span></td><td>10 a 14</td><td>Ação prioritária, em curto prazo.</td></tr><tr><td><span class="badge nv-critico">Crítico</span></td><td>15 a 25</td><td>Ação imediata; avaliar interrupção da atividade.</td></tr></table>
+  ${secGHE(e,5)}
+  <h2 class="sec">6. Inventário de riscos</h2>${e.ghes.map(g=>`<h3>${esc(g.nome)} — ${qtdGHE(e,g)} trabalhador(es)</h3>${g.riscos.length?`<table><tr><th>Tipo</th><th>Agente / perigo</th><th>Fonte / circunstância</th><th>Exposição</th><th>Avaliação</th><th>Possíveis danos</th><th>P</th><th>S</th><th>Nível</th><th>Controles existentes</th></tr>
+   ${g.riscos.map(r=>`<tr><td>${TIPOS[r.tipo]?.n}</td><td>${esc(r.agente)}</td><td>${esc(r.fonte)}</td><td>${esc(r.exposicao)}</td><td>${esc(r.avaliacao)}${r.intensidade?`: ${esc(r.intensidade)} ${esc(r.unidade)}${r.limite!==''?` (LT ${esc(r.limite)})`:''}`:''}${r.tecnica?`<br><span class="nota">${esc(r.tecnica)}</span>`:''}</td><td>${esc(r.danos)}</td><td>${r.prob}</td><td>${r.sev}</td><td>${nvBadge(r)}</td><td>${[r.epc&&'EPC/Adm.: '+esc(r.epc),r.epi&&'EPI: '+esc(r.epi)+(r.ca?' (CA '+esc(r.ca)+')':'')].filter(Boolean).join('<br>')||'—'}</td></tr>`).join('')}</table>`:'<p>Não foram identificados riscos para este grupo.</p>'}`).join('')}
+  <h3>Resumo por nível de risco</h3><table style="width:auto"><tr>${['Baixo','Moderado','Alto','Crítico'].map(l=>`<th>${l}</th>`).join('')}</tr><tr>${['Baixo','Moderado','Alto','Crítico'].map(l=>`<td style="text-align:center">${todos.filter(r=>nivel(r.prob,r.sev).l===l).length}</td>`).join('')}</tr></table>
+  <h2 class="sec">7. Plano de ação</h2><p>As medidas de prevenção obedecem à hierarquia: eliminação do fator de risco, minimização e controle por medidas de proteção coletiva, medidas administrativas ou de organização do trabalho e, por último, equipamentos de proteção individual.</p>
+  ${e.acoes.length?`<table><tr><th>GHE</th><th>Risco</th><th>Ação</th><th>Responsável</th><th>Prazo</th><th>Status</th></tr>${e.acoes.map(a=>{const g=e.ghes.find(x=>x.id===a.gheId);const r=g?.riscos.find(x=>x.id===a.riscoId);return`<tr><td>${esc(g?.nome||'')}</td><td>${esc(r?.agente||'Geral')}</td><td>${esc(a.descricao)}</td><td>${esc(a.responsavel)}</td><td>${fmtD(a.prazo)}</td><td>${esc(a.status)}</td></tr>`}).join('')}</table>`:'<p>Não há ações pendentes.</p>'}
+  <h2 class="sec">8. Revisão do programa</h2><p>O inventário de riscos deve ser revisto a cada dois anos (ou três anos, para organizações com certificação em sistema de gestão de SST), ou sempre que houver: implementação de medidas de prevenção; inovações e modificações nas tecnologias, ambientes, processos ou organização do trabalho; identificação de inadequações nas medidas de prevenção; ocorrência de acidentes ou doenças relacionadas ao trabalho; ou mudança nos requisitos legais aplicáveis.</p>
+  <p><b>Data de elaboração:</b> ${fmtD(e.dataElab)} &nbsp; · &nbsp; <b>Próxima revisão:</b> ${fmtD(e.dataElab?addAnos(e.dataElab,2):'')}</p>
+  ${assinatura(c.resp,c.formacao,c.registro)}${assinatura('','Responsável pela empresa',e.razao)}`;
+}
+function docPCMSO(e){
+  const c=S.consultoria;const X='✔';
+  return capa(e,'PCMSO','Programa de Controle Médico de Saúde Ocupacional','NR-7')+secEmpresa(e,1)+secResp(2,c.medico,'Médico(a) do Trabalho',c.crm?'CRM '+c.crm:'','Médico responsável pelo PCMSO')+
+  `<h2 class="sec">3. Objetivo e base legal</h2><p>O PCMSO tem por objetivo proteger e preservar a saúde dos empregados em relação aos riscos ocupacionais, conforme a avaliação de riscos do Programa de Gerenciamento de Riscos (PGR) da organização, nos termos da Norma Regulamentadora nº 7 (NR-7). O programa tem caráter de prevenção, rastreamento e diagnóstico precoce dos agravos à saúde relacionados ao trabalho.</p>
+  <h2 class="sec">4. Exames médicos ocupacionais</h2><p>O PCMSO inclui os exames: <b>admissional</b> (antes do início das atividades); <b>periódico</b>; de <b>retorno ao trabalho</b> (no primeiro dia de retorno, após afastamento igual ou superior a 30 dias por doença ou acidente); de <b>mudança de riscos ocupacionais</b> (antes da mudança); e <b>demissional</b> (em até 10 dias contados do término do contrato, dispensado se o último exame clínico ocupacional tiver sido realizado há menos de 135 dias para empresas de grau de risco 1 e 2, ou 90 dias para grau de risco 3 e 4).</p>
+  <p>O exame clínico periódico será realizado anualmente, ou em intervalos menores a critério do médico, para empregados expostos a riscos ocupacionais identificados e classificados no PGR e para portadores de doenças crônicas que aumentem a susceptibilidade; para os demais, a cada dois anos.</p>
+  ${secGHE(e,5)}
+  <h2 class="sec">6. Riscos e exames por GHE</h2>${e.ghes.map(g=>{const ex=examesGHE(g);return`<h3>${esc(g.nome)}</h3>
+   <p><b>Riscos ocupacionais (conforme PGR):</b> ${g.riscos.length?g.riscos.map(r=>`${esc(r.agente)} <i>(${TIPOS[r.tipo]?.n})</i>`).join('; '):'Ausência de riscos ocupacionais específicos.'}</p>
+   <table><tr><th>Exame</th><th>Adm.</th><th>Per.</th><th>Ret.</th><th>Mud.</th><th>Dem.</th><th>Periodicidade</th></tr>${ex.map(([n,o],i)=>`<tr><td>${esc(n)}</td><td>${X}</td><td>${X}</td><td>${i===0?X:''}</td><td>${X}</td><td>${X}</td><td>${esc(o.per)}</td></tr>`).join('')}</table>`}).join('')}
+  <p class="nota">Adm. = admissional · Per. = periódico · Ret. = retorno ao trabalho · Mud. = mudança de riscos · Dem. = demissional. Exames complementares adicionais poderão ser solicitados a critério do médico responsável.</p>
+  <h2 class="sec">7. Atestado de Saúde Ocupacional (ASO)</h2><p>Para cada exame clínico ocupacional será emitido o ASO, contendo: razão social e CNPJ da organização, nome completo e CPF do empregado, cargo, riscos ocupacionais identificados ou a ausência deles, indicação e data dos exames realizados, definição de apto ou inapto para a função, e nome e CRM do médico responsável pelo PCMSO e do médico examinador, com assinatura.</p>
+  <h2 class="sec">8. Relatório analítico</h2><p>O médico responsável elaborará relatório analítico anual do PCMSO, contendo o número de exames clínicos e complementares realizados, a estatística de resultados anormais, as incidências de doenças relacionadas ao trabalho e a comparação com o período anterior, para discussão com os responsáveis pelo PGR.</p>
+  <h2 class="sec">9. Primeiros socorros</h2><p>A organização deve manter material de primeiros socorros adequado às características da atividade, guardado em local apropriado e sob responsabilidade de pessoa treinada.</p>
+  <p><b>Data de elaboração:</b> ${fmtD(e.dataElab)}</p>${assinatura(c.medico,'Médico(a) do Trabalho – responsável pelo PCMSO',c.crm?'CRM '+c.crm:'')}`;
+}
+function docLTCAT(e){
+  const c=S.consultoria;
+  const concl=e.ghes.map(g=>{const av=g.riscos.map(r=>[r,ltcatAval(r)]).filter(x=>x[1]);return{g,av,esp:av.some(x=>x[1].res===true),pend:av.some(x=>x[1].res===null)}});
+  return capa(e,'LTCAT','Laudo Técnico das Condições Ambientais do Trabalho','Lei 8.213/91 – art. 58 · Decreto 3.048/99')+secEmpresa(e,1)+secResp(2,c.eng,'Engenheiro(a) de Segurança do Trabalho / Médico(a) do Trabalho',c.crea)+
+  `<h2 class="sec">3. Objetivo e base legal</h2><p>Este laudo tem por objetivo identificar e avaliar a exposição dos trabalhadores a agentes nocivos químicos, físicos e biológicos, ou associação de agentes, prejudiciais à saúde ou à integridade física, para fins de comprovação perante a Previdência Social, nos termos dos artigos 57 e 58 da Lei nº 8.213/1991, do Anexo IV do Decreto nº 3.048/1999 e das instruções normativas do INSS vigentes. As informações deste laudo subsidiam o Perfil Profissiográfico Previdenciário (PPP) e o evento S-2240 do eSocial.</p>
+  <h2 class="sec">4. Metodologia</h2><p>As avaliações quantitativas seguem as metodologias das Normas de Higiene Ocupacional (NHO) da Fundacentro e os limites de tolerância da NR-15. Para agentes reconhecidamente cancerígenos (LINACH grupo 1) e para agentes biológicos, a avaliação é qualitativa. A exposição é considerada para fins de aposentadoria especial quando ocorre de forma <b>habitual e permanente, não ocasional nem intermitente</b>. Riscos ergonômicos, de acidentes e psicossociais não são objeto deste laudo.</p>
+  ${secGHE(e,5)}
+  <h2 class="sec">6. Avaliação dos agentes nocivos por GHE</h2>${concl.map(({g,av,esp,pend})=>`<h3>${esc(g.nome)}</h3>${av.length?`<table><tr><th>Agente</th><th>Cód. Anexo IV</th><th>Fonte</th><th>Exposição</th><th>Resultado / LT</th><th>Técnica</th><th>EPC / EPI (CA)</th><th>EPI eficaz</th><th>Análise</th></tr>
+   ${av.map(([r,x])=>`<tr><td>${esc(r.agente)}</td><td>${esc(AG[r.agenteId]?.anexoIV||'—')}</td><td>${esc(r.fonte)}</td><td>${esc(r.exposicao)}</td><td>${r.intensidade?esc(r.intensidade+' '+r.unidade):'Qualitativa'}${r.limite!==''?' / '+esc(r.limite):''}</td><td>${esc(r.tecnica)}</td><td>${esc([r.epc,r.epi&&(r.epi+(r.ca?' (CA '+r.ca+')':''))].filter(Boolean).join(' / '))||'—'}</td><td>${esc(r.epiEficaz)}</td><td>${esc(x.txt)}</td></tr>`).join('')}</table>`:'<p>Não foram identificados agentes físicos, químicos ou biológicos.</p>'}
+   <p><b>Conclusão:</b> ${pend?'⚠ <b>Conclusão pendente</b> – há agente(s) que dependem de avaliação quantitativa.':esp?'As atividades deste GHE <b>ENSEJAM</b> aposentadoria especial (25 anos de exposição), conforme análise acima.':'As atividades deste GHE <b>NÃO ENSEJAM</b> aposentadoria especial.'}</p>`).join('')}
+  <h2 class="sec">7. Conclusão geral</h2><table><tr><th>GHE</th><th>Cargos</th><th>Conclusão</th></tr>${concl.map(({g,esp,pend})=>`<tr><td>${esc(g.nome)}</td><td>${esc(e.cargos.filter(x=>g.cargoIds.includes(x.id)).map(x=>x.nome).join(', '))}</td><td>${pend?'Pendente de avaliação':esp?'<b>Enseja aposentadoria especial</b>':'Não enseja aposentadoria especial'}</td></tr>`).join('')}</table>
+  <p>Este laudo deve ser atualizado sempre que houver alteração no ambiente de trabalho, no processo produtivo ou na organização do trabalho que possa modificar a exposição aos agentes nocivos.</p>
+  <p><b>Data de elaboração:</b> ${fmtD(e.dataElab)}</p>${assinatura(c.eng,'Engenheiro(a) de Segurança do Trabalho / Médico(a) do Trabalho',c.crea)}`;
+}
+
+/* ================== DIÁLOGOS ================== */
+let dlgSave=null;
+function openDlg(title,body,onSave){dlg.innerHTML=`<div class="dlg-h">${title}<button onclick="dlg.close()">✕</button></div><div class="dlg-b">${body}</div><div class="dlg-f"><button onclick="dlg.close()">Cancelar</button><button class="pri" onclick="if(dlgSave()!==false)dlg.close()">Salvar</button></div>`;dlgSave=onSave;dlg.showModal()}
+function dlgConsultoria(){const c=S.consultoria;
+  openDlg('Minha consultoria',`<div class="fg">${inp('c_nome','Nome da consultoria / profissional',c.nome,'span2')}${inp('c_cnpj','CNPJ / CPF',c.cnpj)}${inp('c_cidade','Cidade',c.cidade)}${inp('c_tel','Telefone',c.tel,'span2')}${inp('c_email','E-mail',c.email,'span2')}
+   <div class="sep">Responsável técnico pelo PGR</div>${inp('c_resp','Nome',c.resp,'span2')}${inp('c_formacao','Formação',c.formacao)}${inp('c_registro','Registro (ex.: MTE, CREA)',c.registro)}
+   <div class="sep">Médico responsável pelo PCMSO</div>${inp('c_medico','Nome',c.medico,'span3')}${inp('c_crm','CRM / UF',c.crm)}
+   <div class="sep">Responsável pelo LTCAT (Eng. de Segurança ou Médico do Trabalho)</div>${inp('c_eng','Nome',c.eng,'span3')}${inp('c_crea','CREA / CRM',c.crea)}</div>`,
+   ()=>{['nome','cnpj','cidade','tel','email','resp','formacao','registro','medico','crm','eng','crea'].forEach(k=>c[k]=v('c_'+k));save();render();toast('Dados da consultoria salvos')})}
+function dlgNovaEmpresa(){
+  openDlg('Nova empresa',`<div class="fg">${inp('n_cnpj','CNPJ',' ','span2','placeholder="00.000.000/0000-00"')}${inp('n_razao','Razão social','','span2')}
+   ${sel('n_modelo','Começar a partir de',[['','Em branco'],...Object.entries(MODELOS).map(([k,m])=>[k,'Modelo: '+m.nome])],'','span4')}</div>
+   <p class="muted" style="font-size:12px">Depois de criar, use "Buscar" na aba Dados para preencher automaticamente pelo CNPJ.</p>`,
+   ()=>{const e=novaEmpresa(v('n_razao').trim(),v('n_cnpj').trim());if(v('n_modelo'))aplicarModelo(e,v('n_modelo'));S.empresas.push(e);save();go(e.id,v('n_modelo')?'ghe':'dados');toast('Empresa criada')});
+  $('n_cnpj').value='';
+}
+function carregarExemplo(){const e=novaEmpresa('Auto Center Exemplo Ltda','00.000.000/0001-00');Object.assign(e,{fantasia:'Auto Center Exemplo',cnae:'4520-0/01',cnaeDesc:'Serviços de manutenção e reparação mecânica de veículos automotores',endereco:'Rua Exemplo, 100, Centro',cidade:'São Paulo',uf:'SP',cep:'01000-000'});aplicarModelo(e,'oficina');
+  if(!S.consultoria.nome)Object.assign(S.consultoria,{nome:'Minha Consultoria SST',resp:'Nome do Técnico',registro:'MTE 00000',medico:'Dr(a). Nome do Médico',crm:'00000/SP',eng:'Eng. Nome do Engenheiro',crea:'CREA 0000000000',cidade:'São Paulo'});
+  S.empresas.push(e);save();go(e.id,'ghe');toast('Empresa de exemplo carregada')}
+function exportar(){const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`risco360-backup-${hojeISO()}.json`;a.click();URL.revokeObjectURL(a.href)}
+function importar(inpEl){const f=inpEl.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.empresas)throw 0;if(!confirm('Substituir todos os dados atuais pelo backup?'))return;S=d;save();go(null);toast('Backup restaurado')}catch(x){toast('Arquivo de backup inválido')}};r.readAsText(f);inpEl.value=''}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-marca-50: #e0f2ef;
+  --color-marca-500: #1a8a7e;
+  --color-marca-600: #127369;
+  --color-marca-700: #0e5f57;
+  --color-marca-900: #0f3d3e;
+  --color-destaque: #5fd3b3;
+}
+
+body {
+  background: #f2f5f7;
+  color: #1d2b36;
+}
